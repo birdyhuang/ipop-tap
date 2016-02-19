@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
@@ -151,7 +151,7 @@ peerlist_set_local(const char *_local_id,
     memcpy(&local_ipv6_addr, _local_ipv6_addr, sizeof(struct in6_addr));
     struct in_addr dest_ipv4_addr;
     char ip[] = "127.0.0.1";
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, ip, &dest_ipv4_addr.s_addr)) {
 #elif defined(WIN32)
     CHAR *Term;
@@ -183,7 +183,7 @@ peerlist_set_local_p(const char *_local_id, const char *_local_ipv4_addr_p,
 {
     struct in_addr local_ipv4_addr_n;
     struct in6_addr local_ipv6_addr_n;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, _local_ipv4_addr_p, &local_ipv4_addr_n)) {
 #elif defined(WIN32)
     CHAR* Term;
@@ -194,7 +194,7 @@ peerlist_set_local_p(const char *_local_id, const char *_local_ipv4_addr_p,
         fprintf(stderr, "Bad IPv4 address format: %s\n", _local_ipv4_addr_p);
         return -1;
     }
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET6, _local_ipv6_addr_p, &local_ipv6_addr_n)) {
 #elif defined(WIN32)
     ULONG ScopeId;
@@ -268,7 +268,7 @@ peerlist_add(const char *id, const struct in_addr *dest_ipv4,
     peer->local_ipv4_addr.s_addr &= router_subnet_mask.s_addr;
 
     // ipv4_addr_table
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     inet_ntop(AF_INET, &peer->local_ipv4_addr, ipv4_key, ipv4_key_length);
 #elif defined(WIN32)
     RtlIpv4AddressToString(&peer->local_ipv4_addr, ipv4_key);
@@ -288,7 +288,7 @@ peerlist_add(const char *id, const struct in_addr *dest_ipv4,
 	pthread_mutex_unlock(&ip4_tbl_lck);
 
     // ipv6_addr_table:
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     inet_ntop(AF_INET6, &peer->local_ipv6_addr, ipv6_key, ipv6_key_length);
 #elif defined(WIN32)
     RtlIpv6AddressToString(&peer->local_ipv6_addr, ipv6_key);
@@ -362,7 +362,7 @@ peerlist_add_p(const char *id, const char *dest_ipv4, const char *dest_ipv6,
 {
     struct in_addr dest_ipv4_n;
     struct in6_addr dest_ipv6_n;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, dest_ipv4, &dest_ipv4_n)) {
 #elif defined(WIN32)
     CHAR* Term;
@@ -372,7 +372,7 @@ peerlist_add_p(const char *id, const char *dest_ipv4, const char *dest_ipv6,
         fprintf(stderr, "Bad IPv4 address format: %s\n", dest_ipv4);
         return -1;
     }
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET6, dest_ipv6, &dest_ipv6_n)) {
 #elif defined(WIN32)
     ULONG ScopeId;
@@ -495,7 +495,7 @@ peerlist_get_by_local_ipv4_addr(struct in_addr *_local_ipv4_addr,
     _local_ipv4_addr->s_addr &= router_subnet_mask.s_addr;
 
     char key[4*4];
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     inet_ntop(AF_INET, _local_ipv4_addr, key, sizeof(key)/sizeof(char));
 #elif defined(WIN32)
     RtlIpv4AddressToString(_local_ipv4_addr, key);
@@ -515,7 +515,7 @@ peerlist_get_by_local_ipv4_addr_p(const char *_local_ipv4_addr,
                                   struct peer_state **peer)
 {
     struct in_addr _local_ipv4_addr_n;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, _local_ipv4_addr, &_local_ipv4_addr_n)) {
 #elif defined(WIN32)
     CHAR* Term;
@@ -550,7 +550,7 @@ peerlist_get_by_local_ipv6_addr(struct in6_addr *_local_ipv6_addr,
         return -1;
     }
     char key[5*8];
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     inet_ntop(AF_INET6, _local_ipv6_addr, key, sizeof(key)/sizeof(char));
 #elif defined(WIN32)
     RtlIpv6AddressToString(_local_ipv6_addr, key);
@@ -569,7 +569,7 @@ peerlist_get_by_local_ipv6_addr_p(const char *_local_ipv6_addr,
                                   struct peer_state **peer)
 {
     struct in6_addr _local_ipv6_addr_n;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET6, _local_ipv6_addr, &_local_ipv6_addr_n)) {
 #elif defined(WIN32)
     ULONG ScopeId;
@@ -606,7 +606,7 @@ int
 override_base_ipv4_addr_p(const char *_local_ipv4_addr_p)
 {
     struct in_addr local_ipv4_addr_n;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, _local_ipv4_addr_p, &local_ipv4_addr_n)) {
 #elif defined(WIN32)
     CHAR* Term;

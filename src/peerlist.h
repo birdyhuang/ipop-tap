@@ -28,7 +28,7 @@
 #ifndef _PEERLIST_H_
 #define _PEERLIST_H_
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 #include <arpa/inet.h>
 #elif defined(WIN32)
 #include <winsock2.h>
@@ -60,7 +60,7 @@ extern struct peer_state peerlist_local; // used to publicly expose the local
 
 extern struct peer_state null_peer;
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 int peerlist_init();
 #elif defined(WIN32)
 WIN32_EXPORT int peerlist_init();
@@ -69,7 +69,7 @@ int peerlist_reset_iterators();
 int peerlist_set_local(const char *_local_id,
                        const struct in_addr *_local_ipv4_addr,
                        const struct in6_addr *_local_ipv6_addr);
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 int peerlist_set_local_p(const char *_local_id, const char *_local_ipv4_addr_p,
                          const char *_local_ipv6_addr_p);
 #elif defined(WIN32)
@@ -79,7 +79,7 @@ WIN32_EXPORT int peerlist_set_local_p(const char *_local_id,
 #endif
 int peerlist_add(const char *id, const struct in_addr *dest_ipv4,
                  const struct in6_addr *dest_ipv6, const uint16_t port);
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 int peerlist_add_p(const char *id, const char *dest_ipv4, const char *dest_ipv6,
                    const uint16_t port);
 int peerlist_add_by_uid(const char *id);
@@ -111,7 +111,7 @@ void retrieve_id(const char ** key);
 void iterate_id_table();
 int mac_add(const unsigned char * ipop_buf, int mac_offset);
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 int override_base_ipv4_addr_p(const char *ipv4);
 int set_subnet_mask(unsigned int mask_len, unsigned int router_mask_len);
 #elif defined(WIN32)
