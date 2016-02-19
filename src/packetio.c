@@ -30,10 +30,13 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 #include <sys/socket.h>
 #include <net/if.h>
 #include <arpa/inet.h>
+#ifdef __APPLE__
+#include "mac_tap.h"
+#endif
 #elif defined(WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -60,7 +63,7 @@ ipop_send_thread(void *data)
     thread_opts_t *opts = (thread_opts_t *) data;
     int sock4 = opts->sock4;
     int sock6 = opts->sock6;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     int tap = opts->tap;
 #elif defined(WIN32)
     windows_tap *win32_tap = opts->win32_tap;
@@ -82,7 +85,7 @@ ipop_send_thread(void *data)
 
         int arp = 0;
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
         if ((rcount = read(tap, buf, BUFLEN-BUF_OFFSET)) < 0) {
 #elif defined(WIN32)
         if ((rcount = read_tap(win32_tap, (char *)buf, BUFLEN-BUF_OFFSET)) < 0) {
@@ -104,7 +107,7 @@ ipop_send_thread(void *data)
                 create_arp_response_sw(buf, (unsigned char * ) opts->mac, 
                                        (unsigned char *) opts->my_ip4);
                 // Write back ARP reply to tap device
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
                 int r = write(tap, buf, rcount);
 #elif defined(WIN32)
                 int r = write_tap(win32_tap, (char *)buf, rcount);
@@ -155,7 +158,7 @@ ipop_send_thread(void *data)
         if (buf[12] == 0x08 && buf[13] == 0x06 && buf[21] == 0x01
             && !opts->switchmode) {
             if (create_arp_response(buf) == 0) {
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
                 int r = write(tap, buf, rcount);
 #elif defined(WIN32)
                 int r = write_tap(win32_tap, (char *)buf, rcount);
@@ -251,7 +254,7 @@ ipop_send_thread(void *data)
 
     close(sock4);
     close(sock6);
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     tap_close();
 #elif defined(WIN32)
     // TODO - Add close socket for tap
@@ -273,7 +276,7 @@ ipop_recv_thread(void *data)
     thread_opts_t *opts = (thread_opts_t *) data;
     int sock4 = opts->sock4;
     int sock6 = opts->sock6;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     int tap = opts->tap;
 #elif defined(WIN32)
     windows_tap *win32_tap = opts->win32_tap;
@@ -420,7 +423,7 @@ ipop_recv_thread(void *data)
              (memcmp(buf, buf+6, 6) == 0 && opts->switchmode == 1)) {
             update_mac(buf, opts->mac);
         }
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
         if (write(tap, buf, rcount) < 0) {
 #elif defined(WIN32)
         if (write_tap(win32_tap, (char *)buf, rcount) < 0) {
@@ -432,7 +435,7 @@ ipop_recv_thread(void *data)
 
     close(sock4);
     close(sock6);
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     tap_close();
 #elif defined(WIN32)
     // TODO - Add close for windows tap

@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 void *ipop_send_thread(void *data);
 void *ipop_recv_thread(void *data);
 #elif defined(WIN32)
