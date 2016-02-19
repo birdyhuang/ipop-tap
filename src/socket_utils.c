@@ -30,10 +30,13 @@
 #include <unistd.h>
 #include <stdint.h>
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 #include <sys/socket.h>
 #include <net/if.h>
 #include <arpa/inet.h>
+#ifdef __APPLE__
+#include <netinet/in.h> // 'struct sockaddr_in’ must be imported from module ‘Darwin.POSIX.netinet.in'
+#endif
 #elif defined(WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -66,7 +69,7 @@ socket_utils_create_ipv4_udp_socket(const char* ip, uint16_t port)
     addr.sin_port = htons(port);
     //addr.sin_addr.s_addr = INADDR_ANY;
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     if (!inet_pton(AF_INET, ip, &addr.sin_addr.s_addr)) {
 #elif defined(WIN32)
     CHAR* Term;
