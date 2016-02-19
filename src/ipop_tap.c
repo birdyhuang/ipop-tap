@@ -35,10 +35,13 @@
 #include <pthread.h>
 #include <getopt.h>
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
 #include <limits.h>
 #include <pwd.h>
 #include <net/if.h>
+#ifdef __APPLE__
+#include "mac_tap.h"
+#endif // !__APPLE__
 #endif
 
 #include <jansson.h>
@@ -160,7 +163,7 @@ main_help(const char *executable)
            "                   you're using multiple clients on the same\n"
            "                   machine, device names must be different. Max\n"
            "                   length of %d characters. (default: 'ipop0')\n",
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
                                IFNAMSIZ-1);
 #elif defined(WIN32)
                                99);
@@ -186,7 +189,7 @@ main(int argc, const char *argv[])
     char ipv4_addr[4*4] = { 0 };
     char ipv6_addr[8*5] = { 0 };
     uint16_t port = 0;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     char tap_device_name[IFNAMSIZ] = { 0 };
 #elif defined(WIN32)
     char tap_device_name[100] = { 0 };
@@ -386,7 +389,7 @@ main(int argc, const char *argv[])
 
     // write out the threading options to be passed to the runner threads
     thread_opts_t opts;
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     opts.tap = tap_open(tap_device_name, opts.mac);
 #elif defined(WIN32)
     opts.win32_tap = open_tap(tap_device_name, opts.mac);
@@ -394,7 +397,7 @@ main(int argc, const char *argv[])
     opts.local_ip4 = ipv4_addr;
     opts.local_ip6 = ipv6_addr;
     opts.sock4 = socket_utils_create_ipv4_udp_socket("0.0.0.0", port);
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     opts.sock6 = socket_utils_create_ipv6_udp_socket(
         port, if_nametoindex(tap_device_name)
     );
@@ -403,7 +406,7 @@ main(int argc, const char *argv[])
     opts.send_func = NULL;
     opts.recv_func = NULL;
 
-#if defined(LINUX) || defined(ANDROID)
+#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
     // configure the tap device
 	char myip[4];
     tap_set_ipv4_addr(ipv4_addr, 24, myip);
