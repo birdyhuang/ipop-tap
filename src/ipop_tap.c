@@ -345,8 +345,11 @@ main(int argc, const char *argv[])
         generate_ipv6_address("fd50:0dbc:41f2:4a3c", 64, ipv6_addr);
     if (ipv4_addr[0] == '\0') strcpy(ipv4_addr, "172.31.0.100");
     if (port == 0) port = 5800;
+#if !defined (__APPLE__)
     if (tap_device_name[0] == '\0') strcpy(tap_device_name, "ipop0");
-
+#else   // MacOSX cannot change the device name, tapX
+    if (tap_device_name[0] == '\0') strcpy(tap_device_name, "tap0");
+#endif
     if (verbose) {
         // pretty-print the client configuration
         printf("Configuration Loaded:\n");
