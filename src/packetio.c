@@ -86,8 +86,9 @@ ipop_send_thread(void *data)
         int arp = 0;
 
 #if defined(LINUX) || defined(ANDROID) || defined(__APPLE__)
-        int err = rcount = read(tap, buf, BUFLEN-BUF_OFFSET;
-        if (err) < 0) {
+        int err = rcount = read(tap, buf, BUFLEN-BUF_OFFSET);
+        fprintf(stderr, "%s", buf);
+        if (err < 0) {
 #elif defined(WIN32)
         if ((rcount = read_tap(win32_tap, (char *)buf, BUFLEN-BUF_OFFSET)) < 0) {
 #endif
